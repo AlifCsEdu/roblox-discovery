@@ -27,6 +27,22 @@ export const searchInputSchema = z.object({
   limit: z.number().min(1).max(50).default(10),
 });
 
+// Instant search - no ratings, just Rolimons data
+export const instantSearchInputSchema = z.object({
+  query: z.string().min(1),
+  genres: z.array(z.string()).optional(),
+  min_players: z.number().min(0).optional(),
+  sort: z.enum(['relevance', 'players', 'trending']).default('relevance'),
+  limit: z.number().min(1).max(50).default(10),
+});
+
+// Batch rating fetch for progressive loading
+export const batchRatingInputSchema = z.object({
+  placeIds: z.array(z.string()),
+});
+
 export type GameListInput = z.infer<typeof gameListInputSchema>;
 export type GameDetailInput = z.infer<typeof gameDetailInputSchema>;
 export type SearchInput = z.infer<typeof searchInputSchema>;
+export type InstantSearchInput = z.infer<typeof instantSearchInputSchema>;
+export type BatchRatingInput = z.infer<typeof batchRatingInputSchema>;

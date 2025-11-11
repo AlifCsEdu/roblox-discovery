@@ -1,22 +1,24 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { GameGrid } from '@/components/features/GameGrid';
 import { trpc } from '@/lib/api/trpc-client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
+import { GameGridSkeleton } from '@/components/ui/skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GENRES, SORT_OPTIONS } from '@/constants/genres';
+import type { Game } from '@/types';
 
 function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
   // Initialize state from URL params
-  const [inputValue, setInputValue] = useState(searchParams.get('q') || ''); // What user is typing
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || ''); // What we actually search for
+  const [inputValue, setInputValue] = useState(searchParams.get('q') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedGenres, setSelectedGenres] = useState<string[]>(
     searchParams.get('genres')?.split(',').filter(Boolean) || []
   );
@@ -29,53 +31,128 @@ function SearchPageContent() {
   const [page, setPage] = useState(0);
   const limit = 20;
 
-  // Handle input change (just updates the input field, doesn't trigger search)
+  // Store results with and without ratings
+  const [instantResults, setInstantResults] = useState<Game[]>([]);
+  const [finalResults, setFinalResults] = useState<Game[]>([]);
+  const [isLoadingRatings, setIsLoadingRatings] = useState(false);
+
+  // Handle input change
   const handleInputChange = (value: string) => {
-    console.log('[SEARCH PAGE] Input changed to:', value);
     setInputValue(value);
   };
 
-  // Handle search trigger (Enter key press from SearchBar)
+  // Handle search trigger
   const handleSearch = () => {
-    console.log('[SEARCH PAGE] Triggering search for:', inputValue);
+    console.log('[SEARCH PAGE] Triggering instant search for:', inputValue);
     setSearchQuery(inputValue);
     setPage(0);
   };
 
-  // Fetch search results
-  const { data, isLoading, error, refetch } = trpc.search.games.useQuery(
+  // INSTANT search - no ratings
+  const { data: instantData, isLoading: isLoadingInstant, error, refetch } = trpc.search.instant.useQuery(
     {
       query: searchQuery,
       genres: selectedGenres.length > 0 ? selectedGenres : undefined,
-      rating_min: ratingRange[0] > 0 ? ratingRange[0] : undefined,
-      rating_max: ratingRange[1] < 100 ? ratingRange[1] : undefined,
       min_players: minPlayers > 0 ? minPlayers : undefined,
-      sort: sortBy as 'relevance' | 'rating' | 'players' | 'trending',
+      sort: sortBy === 'rating' ? 'relevance' : (sortBy as 'relevance' | 'players' | 'trending'),
       limit: limit * (page + 1),
     },
     {
       enabled: searchQuery.length > 2,
       refetchOnMount: true,
-      // Force fresh data on every query change by disabling cache
       refetchOnReconnect: false,
       retry: false,
     }
   );
+
+  // Update instant results and trigger rating fetch
+  useEffect(() => {
+    if (instantData) {
+      console.log('[SEARCH] Got instant results:', instantData.length);
+      setInstantResults(instantData);
+      
+      // Start fetching ratings in background
+      if (instantData.length > 0) {
+        setIsLoadingRatings(true);
+        fetchRatings(instantData);
+      }
+    }
+  }, [instantData]);
+
+  // Fetch ratings progressively
+  const fetchRatings = async (games: Game[]) => {
+    try {
+      const placeIds = games.map(g => String(g.roblox_id));
+      console.log('[SEARCH] Fetching ratings for', placeIds.length, 'games');
+      
+      // Fetch ratings from the API endpoint directly
+      const response = await fetch('/api/trpc/search.ratings?input=' + encodeURIComponent(JSON.stringify({ placeIds })));
+      const result = await response.json();
+      const ratingsMap = result.result.data;
+      
+      console.log('[SEARCH] Got ratings:', Object.keys(ratingsMap).length);
+      
+      // Merge ratings into results
+      const gamesWithRatings = games.map(game => {
+        const rating = ratingsMap[String(game.roblox_id)];
+        if (rating) {
+          return {
+            ...game,
+            rating: rating.rating,
+            total_ratings: rating.totalRatings,
+            quality_score: rating.rating || 0,
+          };
+        }
+        return game;
+      });
+
+      // Apply rating filter if active
+      let filteredGames = gamesWithRatings;
+      const hasRatingFilter = ratingRange[0] > 0 || ratingRange[1] < 100;
+      
+      if (hasRatingFilter) {
+        filteredGames = gamesWithRatings.filter(game => {
+          if (game.rating === null || game.rating === 0) return false;
+          return game.rating >= ratingRange[0] && game.rating <= ratingRange[1];
+        });
+      }
+
+      // Re-sort if sorting by rating
+      if (sortBy === 'rating') {
+        filteredGames = filteredGames.sort((a, b) => {
+          if (a.rating === null && b.rating === null) return 0;
+          if (a.rating === null) return 1;
+          if (b.rating === null) return -1;
+          return b.rating - a.rating;
+        });
+      }
+
+      setFinalResults(filteredGames);
+      setIsLoadingRatings(false);
+    } catch (err) {
+      console.error('[SEARCH] Error fetching ratings:', err);
+      // Keep instant results even if rating fetch fails
+      setFinalResults(games);
+      setIsLoadingRatings(false);
+    }
+  };
+
+  // Determine which results to show
+  const displayResults = finalResults.length > 0 ? finalResults : instantResults;
+  const isLoading = isLoadingInstant;
 
   // Debug logging
   useEffect(() => {
     console.log('[SEARCH PAGE] State:', { 
       inputValue,
       searchQuery,
-      page, 
-      limit, 
-      totalLimit: limit * (page + 1), 
-      dataLength: data?.length, 
-      isLoading, 
-      hasError: !!error,
-      dataFirstGame: data?.[0]?.title 
+      instantResults: instantResults.length,
+      finalResults: finalResults.length,
+      displayResults: displayResults.length,
+      isLoading,
+      isLoadingRatings,
     });
-  }, [inputValue, searchQuery, page, data, isLoading, error, limit]);
+  }, [inputValue, searchQuery, instantResults, finalResults, displayResults, isLoading, isLoadingRatings]);
 
   // Update URL when filters change
   useEffect(() => {
@@ -115,7 +192,7 @@ function SearchPageContent() {
     setPage(prev => prev + 1);
   };
 
-  const hasMore = (data && data.length === limit * (page + 1)) || false;
+  const hasMore = (displayResults && displayResults.length === limit * (page + 1)) || false;
 
   return (
     <div className="min-h-screen relative">
@@ -306,7 +383,7 @@ function SearchPageContent() {
               exit={{ opacity: 0 }}
             >
               {/* Results count */}
-              {data && data.length > 0 && (
+              {displayResults && displayResults.length > 0 && (
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -320,7 +397,8 @@ function SearchPageContent() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold">
-                        Found {data.length.toLocaleString()} {data.length === 1 ? 'game' : 'games'}
+                        Found {displayResults.length.toLocaleString()} {displayResults.length === 1 ? 'game' : 'games'}
+                        {isLoadingRatings && <span className="text-xs text-muted-foreground ml-2">(loading ratings...)</span>}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         for &quot;{searchQuery}&quot;
@@ -331,9 +409,11 @@ function SearchPageContent() {
               )}
 
               {/* Game Grid */}
-              {data && data.length > 0 ? (
+              {isLoading ? (
+                <GameGridSkeleton count={12} />
+              ) : displayResults && displayResults.length > 0 ? (
                 <GameGrid
-                  games={data}
+                  games={displayResults}
                   isLoading={isLoading}
                   hasMore={hasMore}
                   onLoadMore={handleLoadMore}

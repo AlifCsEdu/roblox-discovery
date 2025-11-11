@@ -1,4 +1,4 @@
-import { router, publicProcedure, gameListInputSchema, gameDetailInputSchema, searchInputSchema } from './trpc';
+import { router, publicProcedure, gameListInputSchema, gameDetailInputSchema, searchInputSchema, instantSearchInputSchema, batchRatingInputSchema } from './trpc';
 import { 
   classifyGenres,
   getEnrichedGameHybrid,
@@ -326,6 +326,95 @@ export const appRouter = router({
         console.log(`[SEARCH] Returning ${finalResults.length} final results`);
         
         return finalResults;
+      }),
+    
+    // INSTANT search - Returns results immediately without ratings
+    instant: publicProcedure
+      .input(instantSearchInputSchema)
+      .query(async ({ input }) => {
+        console.log('[INSTANT SEARCH] Query:', JSON.stringify(input, null, 2));
+        
+        // Fetch all games from Rolimons (cached, super fast!)
+        const rolimonsGames = await getRolimonsGames();
+        
+        // Convert to SearchableGame format with genres
+        const searchableGames: SearchableGame[] = rolimonsGames.map(game => ({
+          placeId: game.placeId,
+          name: game.name,
+          playerCount: game.playerCount,
+          thumbnailUrl: game.thumbnailUrl,
+          genres: classifyGenres(game.name),
+        }));
+        
+        // Use advanced search with fuzzy matching (NO rating filters)
+        const searchResults = searchGames(searchableGames, input.query, {
+          genres: input.genres,
+          minPlayers: input.min_players,
+          limit: input.limit,
+          sortBy: input.sort, // relevance, players, or trending only
+        });
+        
+        console.log(`[INSTANT SEARCH] Found ${searchResults.length} results instantly!`);
+        
+        // Transform results WITHOUT ratings (instant!)
+        const instantResults = searchResults.map(game => ({
+          id: game.placeId,
+          roblox_id: parseInt(game.placeId),
+          title: game.name,
+          description: null,
+          creator: null,
+          thumbnail_url: game.thumbnailUrl,
+          rating: null, // No rating yet - will be loaded progressively
+          total_ratings: 0,
+          player_count_current: game.playerCount,
+          player_count_peak: Math.round(game.playerCount * 1.5),
+          player_count_7d_avg: game.playerCount,
+          visits: 0,
+          favorite_count: 0,
+          gamepass_count: 0,
+          badge_count: 0,
+          quality_score: 0,
+          genres: game.genres || [],
+          tags: [],
+          is_active: game.playerCount > 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          last_crawled: null,
+        }));
+        
+        return instantResults;
+      }),
+    
+    // Batch rating fetch - For progressive loading
+    ratings: publicProcedure
+      .input(batchRatingInputSchema)
+      .query(async ({ input }) => {
+        console.log(`[BATCH RATINGS] Fetching ratings for ${input.placeIds.length} games`);
+        
+        const placeIds = input.placeIds.map(id => parseInt(id));
+        const universeMap = await batchPlaceIdToUniverseId(placeIds);
+        const universeIds = Array.from(universeMap.values());
+        const votesMap = await getBatchGameVotes(universeIds);
+        
+        // Create rating map: placeId -> rating
+        const ratingsMap: Record<string, { rating: number | null; totalRatings: number }> = {};
+        
+        input.placeIds.forEach(placeId => {
+          const universeId = universeMap.get(parseInt(placeId));
+          if (universeId) {
+            const votes = votesMap.get(universeId);
+            if (votes) {
+              ratingsMap[placeId] = {
+                rating: calculateRating(votes.upVotes, votes.downVotes),
+                totalRatings: votes.upVotes + votes.downVotes,
+              };
+            }
+          }
+        });
+        
+        console.log(`[BATCH RATINGS] Fetched ${Object.keys(ratingsMap).length} ratings`);
+        
+        return ratingsMap;
       }),
   }),
 });

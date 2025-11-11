@@ -182,8 +182,8 @@ export async function batchPlaceIdToUniverseId(placeIds: number[]): Promise<Map<
   
   console.log(`[BATCH PLACE→UNIVERSE] Fetching ${uncachedIds.length}/${placeIds.length} uncached IDs`);
   
-  // Fetch uncached IDs in parallel with controlled concurrency (10 at a time)
-  const batchSize = 10;
+  // Fetch uncached IDs in parallel with controlled concurrency (20 at a time for faster processing)
+  const batchSize = 20;
   for (let i = 0; i < uncachedIds.length; i += batchSize) {
     const batch = uncachedIds.slice(i, i + batchSize);
     
@@ -198,9 +198,9 @@ export async function batchPlaceIdToUniverseId(placeIds: number[]): Promise<Map<
       }
     }));
     
-    // Small delay between batches
+    // Minimal delay between batches (reduced from 50ms to 25ms)
     if (i + batchSize < uncachedIds.length) {
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 25));
     }
   }
   
@@ -317,9 +317,9 @@ export async function getBatchGameVotes(universeIds: number[]): Promise<Map<numb
       }
     }
     
-    // Small delay between batches to be nice to the API
+    // Minimal delay between batches (reduced from 100ms to 50ms)
     if (i + batchSize < uncachedIds.length) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
   }
   

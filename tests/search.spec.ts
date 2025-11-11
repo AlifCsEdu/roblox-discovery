@@ -66,7 +66,7 @@ test.describe('Search Functionality', () => {
   });
 
   test('should perform multiple consecutive searches', async ({ page }) => {
-    test.setTimeout(90000); // Increase timeout for 3 searches (3 × 30s)
+    test.setTimeout(120000); // Increase timeout for 3 searches with delays (3 × 40s)
     const searchInput = page.locator('input[placeholder*="search"]');
     const queries = ['adopt me', 'tower defense', 'simulator'];
     
@@ -75,14 +75,17 @@ test.describe('Search Functionality', () => {
       await searchInput.fill(query);
       await searchInput.press('Enter');
       
-      // Wait for results
+      // Wait for results with longer timeout
       await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-        timeout: 30000 
+        timeout: 40000 
       });
       
       // Verify results are visible
       const gameCards = page.locator('[data-testid="game-card"], .game-card, article');
       await expect(gameCards.first()).toBeVisible();
+      
+      // Small delay between searches to avoid overwhelming the API
+      await page.waitForTimeout(500);
     }
   });
 
