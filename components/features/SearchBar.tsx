@@ -31,18 +31,14 @@ export function SearchBar({ placeholder = "Search for games...", onSearch, showF
   const [ratingRange, setRatingRange] = useState<[number, number]>([0, 100]);
   const [minPlayers, setMinPlayers] = useState<number>(0);
 
-  // Search history from localStorage
-  const [searchHistory, setSearchHistory] = useState<string[]>([]);
-
-  // Load search history on mount
-  useEffect(() => {
+  // Search history from localStorage - initialize with useMemo to avoid setState in effect
+  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       const history = localStorage.getItem('searchHistory');
-      if (history) {
-        setSearchHistory(JSON.parse(history));
-      }
+      return history ? JSON.parse(history) : [];
     }
-  }, []);
+    return [];
+  });
 
   // Debounce search query
   useEffect(() => {
@@ -245,7 +241,7 @@ export function SearchBar({ placeholder = "Search for games...", onSearch, showF
             transition={{ type: "spring", stiffness: 400 }}
             className="absolute top-full mt-2 w-full bg-card border-2 border-primary/20 rounded-2xl shadow-2xl shadow-primary/10 overflow-hidden z-50"
           >
-            {results.map((game: any, index: number) => (
+            {results.map((game, index: number) => (
               <Link
                 key={game.id}
                 href={`/games/${game.roblox_id}`}
@@ -275,7 +271,7 @@ export function SearchBar({ placeholder = "Search for games...", onSearch, showF
                   whileHover={{ backgroundColor: 'rgba(100, 116, 139, 0.15)' }}
                   className="px-4 py-3 text-center text-sm font-semibold text-primary border-t-2 border-primary/20 cursor-pointer"
                 >
-                  View all results for "{query}"
+                  View all results for &quot;{query}&quot;
                 </motion.div>
               </Link>
             )}

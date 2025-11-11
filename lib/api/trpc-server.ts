@@ -1,22 +1,14 @@
 import { router, publicProcedure, gameListInputSchema, gameDetailInputSchema, searchInputSchema } from './trpc';
 import { 
-  getPopularGames, 
-  discoverGamesInRange, 
-  sortGames, 
   classifyGenres,
   getEnrichedGameHybrid,
   getRolimonsGames,
   sortRolimonsGames,
-  placeIdToUniverseId,
   batchPlaceIdToUniverseId,
-  getGameVotes,
   getBatchGameVotes,
   calculateRating,
-  POPULAR_UNIVERSE_IDS,
-  type RobloxGame,
-  type RolimonsGame
 } from '@/lib/roblox-api';
-import { searchGames, getSearchSuggestions, type SearchableGame } from '@/lib/utils/search';
+import { searchGames, type SearchableGame } from '@/lib/utils/search';
 
 export const appRouter = router({
   games: router({
@@ -54,20 +46,13 @@ export const appRouter = router({
           input.offset + fetchCount
         );
         
-        console.log(`[RATING FILTER DEBUG]`);
-        console.log(`  Input: rating_min=${input.rating_min}, rating_max=${input.rating_max}`);
-        console.log(`  hasRatingFilter=${hasRatingFilter}, fetchMultiplier=${fetchMultiplier}`);
-        console.log(`  Fetching ${gamesToFetch.length} games (limit=${input.limit})`);
-        
         // Convert all place IDs to universe IDs in one batch call
         const placeIds = gamesToFetch.map(g => parseInt(g.placeId));
         const universeMap = await batchPlaceIdToUniverseId(placeIds);
-        console.log(`[PLACE→UNIVERSE] Converted ${universeMap.size}/${placeIds.length} place IDs`);
         
         // Batch fetch all votes in one API call
         const universeIds = Array.from(universeMap.values());
         const votesMap = await getBatchGameVotes(universeIds);
-        console.log(`[BATCH VOTES] Got votes for ${votesMap.size} games`);
         
         // Map ratings back to games
         const gamesWithRatings = gamesToFetch.map((game) => {
@@ -79,7 +64,6 @@ export const appRouter = router({
           const votes = votesMap.get(universeId) || { upVotes: 0, downVotes: 0 };
           const rating = calculateRating(votes.upVotes, votes.downVotes);
           
-          console.log(`[RATING DEBUG] ${game.name}: universeId=${universeId}, votes=${votes.upVotes}/${votes.downVotes}, rating=${rating}`);
           
           return {
             ...game,
@@ -102,8 +86,6 @@ export const appRouter = router({
         
         // Apply rating filter AFTER fetching ratings
         let finalGames = sortedWithRatings;
-        console.log(`[RATING FILTER DEBUG] Before filter: ${sortedWithRatings.length} games`);
-        console.log(`[RATING FILTER DEBUG] Ratings: ${sortedWithRatings.slice(0, 5).map(g => `${g.name}=${g.rating}`).join(', ')}...`);
         
         if (hasRatingFilter) {
           // Check if we successfully got any ratings (to avoid filtering all games when API fails)
@@ -115,17 +97,13 @@ export const appRouter = router({
               if (game.rating === null || game.rating === 0) return false;
               return game.rating >= input.rating_min && game.rating <= input.rating_max;
             });
-            console.log(`[RATING FILTER DEBUG] After filter: ${finalGames.length} games`);
-            console.log(`[RATING FILTER DEBUG] Filtered ratings: ${finalGames.slice(0, 5).map(g => `${g.name}=${g.rating}`).join(', ')}...`);
           } else {
             // If no ratings were fetched (API failure), don't filter by rating
-            console.log(`[RATING FILTER DEBUG] No valid ratings found - skipping rating filter (API may have failed)`);
           }
         }
         
         // Limit to requested amount after filtering
         finalGames = finalGames.slice(0, input.limit);
-        console.log(`[RATING FILTER DEBUG] Final return: ${finalGames.length} games`);
         
         // Transform to match expected format
         const transformedGames = finalGames.map(game => ({
@@ -177,7 +155,7 @@ export const appRouter = router({
         }
         
         return {
-          id: game.id,
+          id: String(game.rootPlaceId), // Use rootPlaceId as unique identifier
           roblox_id: game.rootPlaceId,
           title: game.name,
           description: game.description,
@@ -270,7 +248,7 @@ export const appRouter = router({
           
           return {
             id: game.placeId,
-            roblox_id: game.placeId, // Keep as string to match Game type
+            roblox_id: parseInt(game.placeId),
             title: game.name,
             description: null,
             creator: null,

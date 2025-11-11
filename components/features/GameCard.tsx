@@ -155,7 +155,7 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
             
             {/* Genres */}
             <div className="flex flex-wrap gap-2">
-              {game.genres.slice(0, 3).map((genre, i) => (
+              {game.genres.slice(0, 3).map((genre) => (
                 <motion.div
                   key={genre}
                   whileHover={{ scale: 1.1, y: -2 }}

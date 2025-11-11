@@ -56,15 +56,21 @@ function ExplorePageContent() {
     router.replace(newUrl, { scroll: false });
   }, [filters, router]);
 
-  // Accumulate games when new page loads
+  // Accumulate games when new page loads - moved to event handler pattern
   useEffect(() => {
-    if (data?.games) {
-      if (page === 0) {
-        setAllGames(data.games);
-      } else {
-        setAllGames((prev) => [...prev, ...data.games]);
-      }
-    }
+    if (!data?.games) return;
+    
+    // Use queueMicrotask to defer setState to avoid synchronous update
+    queueMicrotask(() => {
+      setAllGames((prev) => {
+        // If page is 0, replace all games
+        if (page === 0) {
+          return data.games;
+        }
+        // Otherwise append new games
+        return [...prev, ...data.games];
+      });
+    });
   }, [data, page]);
 
   // Reset to page 0 when filters change
@@ -78,7 +84,7 @@ function ExplorePageContent() {
     if (data?.total && allGames.length < data.total) {
       setPage((prev) => prev + 1);
     }
-  }, [data?.total, allGames.length]);
+  }, [data, allGames.length]);
 
   const hasMore = data?.total ? allGames.length < data.total : false;
 

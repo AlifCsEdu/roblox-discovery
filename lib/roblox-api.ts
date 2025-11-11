@@ -21,6 +21,7 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const cache = new Map<string, CacheEntry<any>>();
 
 // Rate limiter
@@ -345,6 +346,7 @@ export async function getGameThumbnail(universeId: number): Promise<string | nul
       
       const data = await response.json();
       // Get the first image from media
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const images = data.data?.filter((item: any) => item.assetType === 'Image') || [];
       return images[0]?.imageId ? `https://assetgame.roblox.com/asset/?id=${images[0].imageId}` : null;
     },
@@ -457,6 +459,7 @@ export async function getRolimonsGameByPlaceId(placeId: string): Promise<Rolimon
  * This is the optimal approach - use Rolimons for real-time data, Roblox for static details
  * Returns null if game is not found instead of throwing
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getEnrichedGameHybrid(placeId: number): Promise<any | null> {
   try {
     // First try to get from Rolimons (real-time player count + thumbnail)

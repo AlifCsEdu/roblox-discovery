@@ -138,7 +138,7 @@ async function populateDatabase() {
       try {
         const votes = await getGameVotes(robloxId);
         rating = calculateRating(votes.upVotes, votes.downVotes);
-      } catch (error) {
+      } catch {
         console.log(`  ⚠️  Could not fetch votes, using default rating`);
       }
 
@@ -185,8 +185,8 @@ async function populateDatabase() {
       // Wait 1 second between requests to respect rate limits
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-    } catch (error: any) {
-      console.error(`  ❌ Error processing game ${robloxId}:`, error.message);
+    } catch (error: unknown) {
+      console.error(`  ❌ Error processing game ${robloxId}:`, error instanceof Error ? error.message : String(error));
       errorCount++;
     }
   }

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { SearchBar } from '@/components/features/SearchBar';
 import { GameGrid } from '@/components/features/GameGrid';
 import { trpc } from '@/lib/api/trpc-client';
 import { Button } from '@/components/ui/button';
@@ -51,7 +50,7 @@ function SearchPageContent() {
       rating_min: ratingRange[0] > 0 ? ratingRange[0] : undefined,
       rating_max: ratingRange[1] < 100 ? ratingRange[1] : undefined,
       min_players: minPlayers > 0 ? minPlayers : undefined,
-      sort: sortBy as any,
+      sort: sortBy as 'relevance' | 'rating' | 'players' | 'trending',
       limit: limit * (page + 1),
     },
     {
@@ -324,7 +323,7 @@ function SearchPageContent() {
                         Found {data.length.toLocaleString()} {data.length === 1 ? 'game' : 'games'}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        for "{searchQuery}"
+                        for &quot;{searchQuery}&quot;
                       </p>
                     </div>
                   </div>

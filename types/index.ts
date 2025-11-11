@@ -81,7 +81,7 @@ export interface PaginatedGames {
 export interface SearchLog {
   id: string;
   query: string | null;
-  filters: Record<string, any>;
+  filters: Record<string, string | number | boolean | string[]>;
   result_count: number;
   created_at: string;
 }

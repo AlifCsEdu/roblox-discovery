@@ -12,6 +12,7 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const cache = new Map<string, CacheEntry<any>>();
 
 // Rate limiter
@@ -126,9 +127,6 @@ export async function getGameDetails(placeId: number) {
  * Get current player count for a game
  */
 export async function getPlayerCount(placeId: number): Promise<number> {
-  const cacheKey = `players:${placeId}`;
-  const ttl = 10 * 1000; // 10 seconds
-
   try {
     const gameDetails = await getGameDetails(placeId);
     return gameDetails.playing || 0;

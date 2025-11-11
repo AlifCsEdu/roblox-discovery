@@ -2,6 +2,7 @@
 
 import { use } from 'react';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import { trpc } from '@/lib/api/trpc-client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { ShareButton } from '@/components/ui/share-button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatNumber, formatRating } from '@/lib/utils/cn';
 import Link from 'next/link';
+import type { Game } from '@/types';
 
 interface GameDetailPageProps {
   params: Promise<{ id: string }>;
@@ -27,12 +29,12 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
   const { data: game, isLoading, error } = trpc.games.detail.useQuery(id);
 
   // Use player count directly from API response (real-time from Roblox API)
-  const playerCount = (game as any)?.player_count_current ?? 0;
+  const playerCount = game?.player_count_current ?? 0;
 
   // Fetch related games (same genre)
   const { data: relatedGamesData } = trpc.games.list.useQuery(
     {
-      genres: (game as any)?.genres?.slice(0, 1) || [],
+      genres: game?.genres?.slice(0, 1) || [],
       rating_min: 80,
       rating_max: 100,
       sort: 'rating',
@@ -40,7 +42,7 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
       offset: 0,
     },
     {
-      enabled: !!(game as any)?.genres && (game as any).genres.length > 0,
+      enabled: !!game?.genres && game.genres.length > 0,
     }
   );
 
@@ -95,10 +97,10 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
     );
   }
 
-  // Type assertion to help TypeScript understand game is not null after the check
-  const gameData = game as any;
+  // Type-safe access to game data after null check
+  const gameData = game as Game;
 
-  const relatedGames = relatedGamesData?.games.filter((g: any) => g.roblox_id !== robloxId) || [];
+  const relatedGames = relatedGamesData?.games.filter((g) => g.roblox_id !== robloxId) || [];
 
   // Calculate rating color
   const getRatingColorClass = (rating: number) => {
@@ -119,10 +121,12 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
           transition={{ duration: 0.8 }}
           className="absolute inset-0"
         >
-          <img
+          <Image
             src={gameData.thumbnail_url || '/placeholder-game.jpg'}
             alt={gameData.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background/60" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
@@ -478,7 +482,7 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedGames.map((relatedGame: any, index: number) => (
+              {relatedGames.map((relatedGame, index: number) => (
                 <motion.div
                   key={relatedGame.id}
                   initial={{ opacity: 0, y: 20 }}

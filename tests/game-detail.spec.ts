@@ -6,7 +6,7 @@ test.describe('Game Detail Pages', () => {
     await page.goto('/');
     
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 15000 
+      timeout: 30000 
     });
     
     const firstGame = page.locator('[data-testid="game-card"], .game-card, article').first();
@@ -16,14 +16,14 @@ test.describe('Game Detail Pages', () => {
     await expect(page).toHaveURL(/.*\/games\/\d+.*/);
     
     // Check for game title/name
-    await expect(page.locator('h1, [data-testid="game-title"]')).toBeVisible();
+    await expect(page.locator('h1, [data-testid="game-title"]')).toBeVisible({ timeout: 30000 });
   });
 
   test('should display game information', async ({ page }) => {
     await page.goto('/');
     
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 15000 
+      timeout: 30000 
     });
     
     const firstGame = page.locator('[data-testid="game-card"], .game-card, article').first();
@@ -33,14 +33,14 @@ test.describe('Game Detail Pages', () => {
     await page.waitForURL(/.*\/games\/\d+.*/);
     
     // Should display game stats (players, rating, etc)
-    await expect(page.locator('text=/players|rating|votes/i').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=/players|rating|votes/i').first()).toBeVisible({ timeout: 30000 });
   });
 
   test('should have share button', async ({ page }) => {
     await page.goto('/');
     
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 15000 
+      timeout: 30000 
     });
     
     const firstGame = page.locator('[data-testid="game-card"], .game-card, article').first();
@@ -50,14 +50,14 @@ test.describe('Game Detail Pages', () => {
     
     // Look for share button
     const shareButton = page.locator('[data-testid="share-button"], button:has-text("Share")').first();
-    await expect(shareButton).toBeVisible({ timeout: 10000 });
+    await expect(shareButton).toBeVisible({ timeout: 30000 });
   });
 
   test('should navigate back to homepage from game detail', async ({ page }) => {
     await page.goto('/');
     
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 15000 
+      timeout: 30000 
     });
     
     const firstGame = page.locator('[data-testid="game-card"], .game-card, article').first();

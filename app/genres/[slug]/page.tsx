@@ -7,7 +7,7 @@ import { trpc } from '@/lib/api/trpc-client';
 import { Button } from '@/components/ui/button';
 import { GENRES, DEFAULT_RATING_MIN, DEFAULT_RATING_MAX, DEFAULT_GAMES_PER_PAGE, SORT_OPTIONS } from '@/constants/genres';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { GameFilters } from '@/types';
+import type { GameFilters, Game } from '@/types';
 
 interface GenrePageProps {
   params: Promise<{ slug: string }>;
@@ -25,7 +25,7 @@ export default function GenrePage({ params }: GenrePageProps) {
 
   const [sortBy, setSortBy] = useState<GameFilters['sort']>('trending');
   const [page, setPage] = useState(0);
-  const [allGames, setAllGames] = useState<any[]>([]);
+  const [allGames, setAllGames] = useState<Game[]>([]);
 
   // Fetch games for this genre
   const { data, isLoading } = trpc.games.list.useQuery({
@@ -39,12 +39,12 @@ export default function GenrePage({ params }: GenrePageProps) {
 
   // Accumulate games when new page loads
   useEffect(() => {
-    if (data?.games) {
-      if (page === 0) {
-        setAllGames(data.games);
-      } else {
-        setAllGames((prev) => [...prev, ...data.games]);
-      }
+    if (!data?.games) return;
+    
+    if (page === 0) {
+      setAllGames(data.games);
+    } else {
+      setAllGames((prev) => [...prev, ...data.games]);
     }
   }, [data, page]);
 
@@ -58,7 +58,7 @@ export default function GenrePage({ params }: GenrePageProps) {
     if (data?.total && allGames.length < data.total) {
       setPage((prev) => prev + 1);
     }
-  }, [data?.total, allGames.length]);
+  }, [data, allGames.length]);
 
   const hasMore = data?.total ? allGames.length < data.total : false;
 

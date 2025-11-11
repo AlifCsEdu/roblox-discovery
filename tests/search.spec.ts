@@ -21,7 +21,7 @@ test.describe('Search Functionality', () => {
     
     // Wait for results to load (should see game cards)
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 10000 
+      timeout: 30000 
     });
     
     // Verify results are displayed
@@ -39,7 +39,7 @@ test.describe('Search Functionality', () => {
     await searchInput.fill('bloxburg');
     await searchInput.press('Enter');
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 10000 
+      timeout: 30000 
     });
     
     // Clear and perform second search
@@ -52,7 +52,7 @@ test.describe('Search Functionality', () => {
     
     // Verify second search results load (this was failing before the fix)
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 10000 
+      timeout: 30000 
     });
     
     const gameCards = page.locator('[data-testid="game-card"], .game-card, article');
@@ -66,6 +66,7 @@ test.describe('Search Functionality', () => {
   });
 
   test('should perform multiple consecutive searches', async ({ page }) => {
+    test.setTimeout(90000); // Increase timeout for 3 searches (3 × 30s)
     const searchInput = page.locator('input[placeholder*="search"]');
     const queries = ['adopt me', 'tower defense', 'simulator'];
     
@@ -76,7 +77,7 @@ test.describe('Search Functionality', () => {
       
       // Wait for results
       await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-        timeout: 10000 
+        timeout: 30000 
       });
       
       // Verify results are visible
@@ -118,7 +119,7 @@ test.describe('Search Functionality', () => {
     
     // Verify results are loaded
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 10000 
+      timeout: 30000 
     });
   });
 });

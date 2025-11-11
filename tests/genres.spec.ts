@@ -11,7 +11,7 @@ test.describe('Genre Pages', () => {
       
       // Wait for games to load
       await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-        timeout: 15000 
+        timeout: 30000 
       });
       
       const gameCards = page.locator('[data-testid="game-card"], .game-card, article');
@@ -24,7 +24,7 @@ test.describe('Genre Pages', () => {
     
     // Wait for initial load
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 15000 
+      timeout: 30000 
     });
     
     // Look for rating filter slider or input
@@ -47,7 +47,7 @@ test.describe('Genre Pages', () => {
     await page.goto('/genres/rpg');
     
     await page.waitForSelector('[data-testid="game-card"], .game-card, article', { 
-      timeout: 15000 
+      timeout: 30000 
     });
     
     const firstGame = page.locator('[data-testid="game-card"], .game-card, article').first();

@@ -222,7 +222,7 @@ export default function HomePage() {
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {trendingData?.games.map((game: any, index: number) => (
+              {trendingData?.games.map((game, index: number) => (
                 <GameCard key={game.id} game={game} index={index} />
               ))}
             </div>
@@ -280,7 +280,7 @@ export default function HomePage() {
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {hiddenGemsData?.games.map((game: any, index: number) => (
+              {hiddenGemsData?.games.map((game, index: number) => (
                 <GameCard key={game.id} game={game} index={index} />
               ))}
             </div>
@@ -386,7 +386,7 @@ export default function HomePage() {
                   </motion.div>
                   <h3 className="text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-blue-400 transition-all">Trending Insights</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Discover what's hot right now with trending analytics, player count tracking, and genre popularity stats.
+                    Discover what&apos;s hot right now with trending analytics, player count tracking, and genre popularity stats.
                   </p>
                 </CardContent>
               </Card>

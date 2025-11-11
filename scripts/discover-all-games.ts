@@ -119,8 +119,8 @@ async function fetchGamesBatch(universeIds: number[]) {
     
     const data = await response.json();
     return data.data || [];
-  } catch (error: any) {
-    console.error(`Error fetching batch:`, error.message);
+  } catch (error: unknown) {
+    console.error(`Error fetching batch:`, error instanceof Error ? error.message : String(error));
     return [];
   }
 }
@@ -178,7 +178,7 @@ async function discoverGames() {
         try {
           const votes = await getGameVotes(gameInfo.rootPlaceId);
           rating = calculateRating(votes.upVotes, votes.downVotes);
-        } catch (error) {
+        } catch {
           // Use a heuristic based on favorites if votes fail
           const favoriteRatio = gameInfo.visits > 0 
             ? (gameInfo.favoritedCount / gameInfo.visits) * 100000
@@ -222,8 +222,8 @@ async function discoverGames() {
           }
         }
 
-      } catch (error: any) {
-        console.log(`     ❌ Error: ${error.message}`);
+      } catch (error: unknown) {
+        console.log(`     ❌ Error: ${error instanceof Error ? error.message : String(error)}`);
         totalErrors++;
       }
     }

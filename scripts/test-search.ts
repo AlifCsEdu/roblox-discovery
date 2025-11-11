@@ -62,7 +62,7 @@ async function testSearch() {
   
   // Step 6: Apply ratings and filter
   console.log('6️⃣ Applying ratings and filtering...');
-  let gamesWithRatings = ratedSearchResults.slice(0, 10).map(game => {
+  const gamesWithRatings = ratedSearchResults.slice(0, 10).map(game => {
     const universeId = universeMap.get(parseInt(game.placeId));
     const votes = universeId ? votesMap.get(universeId) : null;
     const rating = votes ? calculateRating(votes.upVotes, votes.downVotes) : null;

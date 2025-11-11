@@ -12,30 +12,27 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
-  const [mounted, setMounted] = useState(false);
-
-  // Initialize theme from localStorage on mount
-  useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else {
-      // Default to dark theme
-      setTheme('dark');
+  // Initialize theme from localStorage - use lazy initialization to avoid setState in effect
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as Theme | null;
+      return savedTheme || 'dark';
     }
-  }, []);
+    return 'dark';
+  });
 
   // Update document class and localStorage when theme changes
+  // On first render, just apply theme; on subsequent renders, also save to localStorage
   useEffect(() => {
-    if (!mounted) return;
-    
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
-    localStorage.setItem('theme', theme);
-  }, [theme, mounted]);
+    
+    // Only save to localStorage if we're in the browser
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', theme);
+    }
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));

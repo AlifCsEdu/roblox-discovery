@@ -12,22 +12,27 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Game } from '@/types';
-import type { RealtimeChannel } from '@supabase/supabase-js';
+
+interface Rating {
+  id: string;
+  game_id: string;
+  user_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+}
 
 /**
  * Hook to subscribe to game updates in real-time
+ * External system synchronization - subscribes to database changes
  */
-export function useRealtimeGames(filters?: {
-  genres?: string[];
-  rating_min?: number;
-}) {
+export function useRealtimeGames() {
   const [games, setGames] = useState<Game[]>([]);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
 
-    // Subscribe to games table changes
+    // Subscribe to games table changes (external system)
     const gamesChannel = supabase
       .channel('games-changes')
       .on(
@@ -38,6 +43,7 @@ export function useRealtimeGames(filters?: {
           table: 'games',
         },
         (payload) => {
+          // Update state based on external system events
           if (payload.eventType === 'INSERT') {
             setGames((prev) => [payload.new as Game, ...prev]);
           } else if (payload.eventType === 'UPDATE') {
@@ -53,27 +59,25 @@ export function useRealtimeGames(filters?: {
       )
       .subscribe();
 
-    setChannel(gamesChannel);
-
     return () => {
       supabase.removeChannel(gamesChannel);
     };
   }, []);
 
-  return { games, channel };
+  return { games };
 }
 
 /**
  * Hook to subscribe to a single game's updates
+ * External system synchronization - subscribes to database changes
  */
 export function useRealtimeGame(robloxId: number) {
   const [game, setGame] = useState<Game | null>(null);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
 
-    // Subscribe to specific game updates
+    // Subscribe to specific game updates (external system)
     const gameChannel = supabase
       .channel(`game-${robloxId}`)
       .on(
@@ -85,33 +89,31 @@ export function useRealtimeGame(robloxId: number) {
           filter: `roblox_id=eq.${robloxId}`,
         },
         (payload) => {
+          // Update state based on external system events
           setGame(payload.new as Game);
         }
       )
       .subscribe();
-
-    setChannel(gameChannel);
 
     return () => {
       supabase.removeChannel(gameChannel);
     };
   }, [robloxId]);
 
-  return { game, channel };
+  return { game };
 }
 
 /**
  * Hook to get live player count updates
- * Polls every 5 seconds and updates via Realtime when data changes
+ * External system synchronization - polls and updates via Realtime
  */
 export function useLivePlayerCount(robloxId: number, initialCount: number = 0) {
   const [playerCount, setPlayerCount] = useState(initialCount);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
 
-    // Subscribe to player count updates
+    // Subscribe to player count updates (external system)
     const playerChannel = supabase
       .channel(`player-count-${robloxId}`)
       .on(
@@ -123,6 +125,7 @@ export function useLivePlayerCount(robloxId: number, initialCount: number = 0) {
           filter: `roblox_id=eq.${robloxId}`,
         },
         (payload) => {
+          // Update state based on external system events
           const newGame = payload.new as Game;
           if (newGame.player_count_current !== undefined) {
             setPlayerCount(newGame.player_count_current);
@@ -131,27 +134,25 @@ export function useLivePlayerCount(robloxId: number, initialCount: number = 0) {
       )
       .subscribe();
 
-    setChannel(playerChannel);
-
     return () => {
       supabase.removeChannel(playerChannel);
     };
   }, [robloxId]);
 
-  return { playerCount, channel };
+  return { playerCount };
 }
 
 /**
  * Hook to subscribe to new ratings for a game
+ * External system synchronization - subscribes to database changes
  */
 export function useRealtimeRatings(robloxId: number) {
-  const [ratings, setRatings] = useState<any[]>([]);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const [ratings, setRatings] = useState<Rating[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
 
-    // Subscribe to new ratings
+    // Subscribe to new ratings (external system)
     const ratingsChannel = supabase
       .channel(`ratings-${robloxId}`)
       .on(
@@ -162,27 +163,26 @@ export function useRealtimeRatings(robloxId: number) {
           table: 'user_ratings',
         },
         (payload) => {
-          setRatings((prev) => [payload.new, ...prev]);
+          // Update state based on external system events
+          setRatings((prev) => [payload.new as Rating, ...prev]);
         }
       )
       .subscribe();
-
-    setChannel(ratingsChannel);
 
     return () => {
       supabase.removeChannel(ratingsChannel);
     };
   }, [robloxId]);
 
-  return { ratings, channel };
+  return { ratings };
 }
 
 /**
  * Hook to subscribe to presence (who's viewing what)
+ * External system synchronization - subscribes to presence channel
  */
 export function usePresence(gameId: string, userId: string) {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -197,6 +197,7 @@ export function usePresence(gameId: string, userId: string) {
 
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
+        // Update state based on external system events
         const state = presenceChannel.presenceState();
         const users = Object.keys(state);
         setOnlineUsers(users);
@@ -213,14 +214,12 @@ export function usePresence(gameId: string, userId: string) {
         }
       });
 
-    setChannel(presenceChannel);
-
     return () => {
       supabase.removeChannel(presenceChannel);
     };
   }, [gameId, userId]);
 
-  return { onlineUsers, channel };
+  return { onlineUsers };
 }
 
 /**
@@ -228,8 +227,6 @@ export function usePresence(gameId: string, userId: string) {
  * Run this during setup if realtime is not enabled
  */
 export async function enableRealtime() {
-  const supabase = createClient();
-  
   // This would typically be done via Supabase dashboard or SQL
   // Included here for reference
   console.log('Enable realtime via Supabase Dashboard:');
