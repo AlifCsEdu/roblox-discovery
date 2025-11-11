@@ -1,113 +1,114 @@
-# Cloudflare Pages Deployment Guide
+# Deployment Guide
 
-## Quick Setup
+## Vercel Deployment (Recommended)
 
-### 1. Cloudflare Pages Configuration
+Vercel is the recommended platform for Next.js applications, offering full support for Next.js 16 with all features.
 
-In your Cloudflare Pages dashboard:
+### Quick Deploy to Vercel
 
-**Build Settings:**
-```
-Framework preset: Next.js
-Build command: npm run build
-Build output directory: .next
-Root directory: (leave empty)
-Node version: 20.x
-```
+#### 1. Connect Your Repository
 
-**IMPORTANT:** Leave the "Deploy command" field **empty**. Cloudflare Pages will automatically handle deployment after the build completes.
+1. Go to [vercel.com](https://vercel.com)
+2. Sign up or log in (use your GitHub account)
+3. Click **"Add New Project"**
+4. Import your GitHub repository: `AlifCsEdu/roblox-discovery`
+5. Vercel will auto-detect Next.js configuration ✅
 
-### 2. Environment Variables
+#### 2. Configure Environment Variables
 
-Add these in **Settings** → **Environment variables**:
+Before deploying, add these environment variables:
 
-#### Required (Production):
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-NEXT_PUBLIC_SITE_URL=https://your-project.pages.dev
+NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
 ```
 
-#### Optional (if using server-side admin features):
+Optional (if using server-side admin features):
 ```bash
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-### 3. Deploy
+#### 3. Deploy
 
-Simply push to your `main` branch:
-```bash
-git push origin main
-```
+Click **"Deploy"** - Vercel will:
+1. Install dependencies (`npm install`)
+2. Run build (`npm run build`)
+3. Deploy to global edge network
+4. Provide a live URL (e.g., `roblox-discovery.vercel.app`)
 
-Cloudflare Pages will automatically:
-1. Detect the push
-2. Run `npm install`
-3. Run `npm run build`
-4. Deploy the `.next` output
+**Total time**: ~2-3 minutes ⚡
 
 ---
 
-## Build Configuration Details
+### Features Supported on Vercel ✅
 
-### Next.js Configuration
-
-The `next.config.ts` is configured for Cloudflare Pages:
-
-- **Output**: `standalone` mode for server-side features (tRPC, dynamic routes)
-- **Images**: `unoptimized: true` (Cloudflare Pages doesn't support Next.js Image Optimization)
-- **Remote Images**: Configured for Roblox CDN URLs
-
-### Supported Features ✅
-
+- ✅ Full Next.js 16 support
+- ✅ Next.js Image Optimization (automatic)
 - ✅ Static pages (/, /explore, /search)
 - ✅ Dynamic routes (/games/[id], /genres/[slug])
 - ✅ API routes via tRPC (/api/trpc/[trpc])
-- ✅ Server-side rendering
-- ✅ Client-side navigation
-- ✅ Environment variables
-
-### Known Limitations ⚠️
-
-- ❌ Next.js Image Optimization (use `unoptimized: true`)
-- ❌ Node.js runtime-specific features (uses Edge Runtime)
-- ❌ Middleware (limited support in Edge Runtime)
+- ✅ Server-side rendering & Edge runtime
+- ✅ Automatic HTTPS with custom domains
+- ✅ Built-in analytics & performance monitoring
+- ✅ Preview deployments for every push
+- ✅ Instant rollbacks
 
 ---
 
-## Troubleshooting
+### Continuous Deployment
 
-### Issue: "npx wrangler deploy" error
+After initial setup, every push to `main` automatically:
+1. Triggers a new deployment
+2. Runs all checks
+3. Creates a preview URL
+4. Deploys to production (if checks pass)
 
-**Solution**: Remove any "Deploy command" from Cloudflare Pages settings. Next.js apps don't need a separate deploy command.
-
-### Issue: Images not loading
-
-**Solution**: Verify `unoptimized: true` is in next.config.ts and remote patterns are configured.
-
-### Issue: API routes failing
-
-**Solution**: Check environment variables are set in Cloudflare Pages dashboard (not just .env.local).
-
-### Issue: Build timeout
-
-**Solution**: Ensure Node.js version is set to 20.x in Cloudflare Pages settings.
+**Preview deployments**: Every pull request gets its own URL for testing!
 
 ---
 
-## Alternative: Vercel Deployment
+### Custom Domain (Optional)
 
-If you prefer Vercel (which has full Next.js support):
+To use your own domain:
 
-1. Import your GitHub repository to Vercel
-2. Add the same environment variables
-3. Deploy (automatic configuration)
+1. Go to **Project Settings** → **Domains**
+2. Add your domain (e.g., `robloxdiscover.com`)
+3. Update your DNS records as instructed
+4. Vercel handles SSL certificates automatically
 
-Vercel provides:
-- Full Next.js Image Optimization
-- Better Next.js 16 support
-- Automatic edge runtime
-- Built-in analytics
+---
+
+## Alternative: Cloudflare Pages
+
+> **Note**: Cloudflare Pages has limited support for Next.js 16. Server-side features (tRPC, dynamic routes) may not work properly. Vercel is recommended.
+
+If you still want to use Cloudflare Pages:
+
+### Requirements
+- Downgrade to Next.js 15
+- Use `@cloudflare/next-on-pages` adapter
+- Limited Image Optimization
+
+### Configuration
+
+```bash
+# Downgrade Next.js
+npm install next@15.0.0
+
+# Install adapter
+npm install --save-dev @cloudflare/next-on-pages
+```
+
+Update `next.config.ts`:
+```typescript
+const nextConfig = {
+  output: 'standalone',
+  images: { unoptimized: true }
+}
+```
+
+**Not recommended** - use Vercel instead for full Next.js 16 support.
 
 ---
 
@@ -121,3 +122,54 @@ npm start
 ```
 
 The app will run on http://localhost:3000 with production optimizations.
+
+---
+
+## Troubleshooting
+
+### Issue: Build fails on Vercel
+
+**Solution**: Check that all environment variables are set in Vercel dashboard.
+
+### Issue: Images not loading
+
+**Solution**: 
+- Verify Supabase URLs are correct
+- Check Roblox CDN is accessible
+- Vercel Image Optimization is automatic (no config needed)
+
+### Issue: API routes failing
+
+**Solution**: 
+- Ensure environment variables include `NEXT_PUBLIC_` prefix for client-side vars
+- Check Supabase keys are correct
+- Verify no CORS issues
+
+### Issue: Dynamic routes showing 404
+
+**Solution**: 
+- This is usually automatic on Vercel
+- Check that routes are properly exported in your pages
+- Review build logs for errors
+
+---
+
+## Deployment Checklist
+
+Before deploying:
+
+- [x] Repository pushed to GitHub
+- [x] Environment variables documented
+- [x] Build succeeds locally (`npm run build`)
+- [x] All tests passing (`npm test`)
+- [ ] Supabase project set up with correct permissions
+- [ ] Environment variables added to Vercel
+- [ ] Custom domain DNS configured (if applicable)
+
+---
+
+## Support
+
+- **Vercel Docs**: https://vercel.com/docs
+- **Next.js Docs**: https://nextjs.org/docs
+- **Issues**: https://github.com/AlifCsEdu/roblox-discovery/issues
