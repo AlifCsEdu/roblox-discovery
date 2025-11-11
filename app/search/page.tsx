@@ -240,127 +240,71 @@ function SearchPageContent() {
           </div>
         </motion.div>
 
-        {/* Advanced Filters Panel - REDESIGNED */}
+        {/* Advanced Filters - COMPACT & PROFESSIONAL */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8 relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-card/80 border-2 border-primary/20 shadow-2xl backdrop-blur-sm"
+          className="mb-8 relative rounded-xl bg-card border border-border shadow-sm"
         >
-          {/* Animated background blur orbs */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl -z-10 animate-pulse" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-cyan-500/10 to-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '1.5s' }} />
-          
-          <div className="relative z-10 p-6 md:p-8">
-            {/* Header with gradient and better styling */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-primary/20">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-xl font-black bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                    Advanced Filters
-                  </h2>
-                  <p className="text-xs text-muted-foreground">Refine your search results</p>
-                </div>
-              </div>
+          <div className="p-4 md:p-5">
+            {/* Compact Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                Filters
+                {selectedGenres.length > 0 && (
+                  <span className="px-1.5 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded">
+                    {selectedGenres.length}
+                  </span>
+                )}
+              </h2>
               {hasActiveFilters && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="h-7 text-xs text-muted-foreground hover:text-foreground"
                 >
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/30 rounded-xl transition-all"
-                  >
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Clear All
-                  </Button>
-                </motion.div>
+                  Clear
+                </Button>
               )}
             </div>
 
-            <div className="space-y-8">
-              {/* Genre filters with enhanced styling */}
+            <div className="space-y-4">
+              {/* Compact Genre Pills */}
               <div>
-                <label className="text-sm font-bold mb-4 flex items-center gap-2">
-                  <div className="w-1.5 h-5 bg-gradient-to-b from-purple-500 to-blue-500 rounded-full" />
-                  <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Genres
-                  </span>
-                  {selectedGenres.length > 0 && (
-                    <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full shadow-md">
-                      {selectedGenres.length}
-                    </span>
-                  )}
-                </label>
-                <div className="flex flex-wrap gap-2.5">
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">Genres</label>
+                <div className="flex flex-wrap gap-1.5">
                   {GENRES.map((genre) => {
                     const isSelected = selectedGenres.includes(genre.slug);
                     return (
-                      <motion.div
+                      <Badge
                         key={genre.slug}
-                        whileHover={{ scale: 1.08, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
+                        variant={isSelected ? 'default' : 'outline'}
+                        className={`cursor-pointer text-xs px-2.5 py-1 rounded-md transition-all ${
+                          isSelected
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            : 'hover:bg-accent hover:text-accent-foreground'
+                        }`}
+                        onClick={() => toggleGenre(genre.slug)}
                       >
-                        <Badge
-                          variant={isSelected ? 'default' : 'outline'}
-                          className={`cursor-pointer text-sm font-bold px-4 py-2.5 rounded-xl transition-all duration-300 ${
-                            isSelected
-                              ? 'bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40'
-                              : 'bg-background/50 border-2 border-border/50 hover:border-primary/50 hover:bg-primary/5 backdrop-blur-sm'
-                          }`}
-                          onClick={() => toggleGenre(genre.slug)}
-                        >
-                          {genre.name}
-                        </Badge>
-                      </motion.div>
+                        {genre.name}
+                      </Badge>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Rating slider with better visuals */}
-              <div>
-                <label className="text-sm font-bold mb-4 flex items-center gap-2">
-                  <div className="w-1.5 h-5 bg-gradient-to-b from-yellow-500 to-orange-500 rounded-full" />
-                  <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Rating Range
-                  </span>
-                </label>
-                <div className="bg-background/50 border-2 border-border/50 rounded-2xl p-6 backdrop-blur-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center shadow-md">
-                        <svg className="w-4 h-4 text-yellow-900" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </div>
-                      <span className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                        {ratingRange[0]}%
-                      </span>
-                    </div>
-                    <div className="text-muted-foreground font-bold">to</div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                        {ratingRange[1]}%
-                      </span>
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center shadow-md">
-                        <svg className="w-4 h-4 text-yellow-900" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
+              {/* Compact Grid for Other Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Rating Range - Compact */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                    Rating: {ratingRange[0]}% - {ratingRange[1]}%
+                  </label>
                   <Slider
                     min={0}
                     max={100}
@@ -370,62 +314,37 @@ function SearchPageContent() {
                       setRatingRange(val);
                       setPage(0);
                     }}
-                    className="my-4"
+                    className="mt-2"
                   />
                 </div>
-              </div>
 
-              {/* Min players & Sort with enhanced cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Minimum Players */}
+                {/* Minimum Players - Compact */}
                 <div>
-                  <label className="text-sm font-bold mb-4 flex items-center gap-2">
-                    <div className="w-1.5 h-5 bg-gradient-to-b from-emerald-500 to-green-500 rounded-full" />
-                    <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                      Minimum Players
-                    </span>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                      </svg>
-                    </div>
-                    <input
-                      type="number"
-                      min={0}
-                      value={minPlayers || ''}
-                      onChange={(e) => {
-                        setMinPlayers(parseInt(e.target.value) || 0);
-                        setPage(0);
-                      }}
-                      placeholder="e.g., 1000"
-                      className="w-full pl-12 pr-4 py-3.5 bg-background/50 border-2 border-border/50 rounded-2xl focus:border-emerald-500/50 focus:outline-none focus:shadow-lg focus:shadow-emerald-500/10 transition-all font-semibold text-foreground placeholder:text-muted-foreground backdrop-blur-sm"
-                    />
-                  </div>
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Min Players</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={minPlayers || ''}
+                    onChange={(e) => {
+                      setMinPlayers(parseInt(e.target.value) || 0);
+                      setPage(0);
+                    }}
+                    placeholder="e.g., 1000"
+                    className="w-full px-3 py-1.5 text-sm bg-background border border-input rounded-md focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring transition-all"
+                  />
                 </div>
 
-                {/* Sort By */}
+                {/* Sort By - Compact & Fixed Styling */}
                 <div>
-                  <label className="text-sm font-bold mb-4 flex items-center gap-2">
-                    <div className="w-1.5 h-5 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full" />
-                    <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                      Sort By
-                    </span>
-                  </label>
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Sort By</label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400 pointer-events-none">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z" />
-                      </svg>
-                    </div>
                     <select
                       value={sortBy}
                       onChange={(e) => {
                         setSortBy(e.target.value);
                         setPage(0);
                       }}
-                      className="w-full pl-12 pr-4 py-3.5 bg-background/50 border-2 border-border/50 rounded-2xl focus:border-blue-500/50 focus:outline-none focus:shadow-lg focus:shadow-blue-500/10 transition-all font-semibold text-foreground cursor-pointer appearance-none backdrop-blur-sm"
+                      className="w-full px-3 py-1.5 pr-8 text-sm bg-background border border-input rounded-md focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring transition-all appearance-none cursor-pointer"
                     >
                       <option value="relevance">Relevance</option>
                       {SORT_OPTIONS.map((option) => (
@@ -434,11 +353,9 @@ function SearchPageContent() {
                         </option>
                       ))}
                     </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
+                    <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
                 </div>
               </div>

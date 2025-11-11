@@ -145,7 +145,7 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-6xl md:text-7xl font-black mb-6 gradient-text"
+              className="text-6xl md:text-7xl font-bold mb-6 gradient-text"
             >
               {gameData.title}
             </motion.h1>
@@ -477,7 +477,7 @@ export default function GameDetailPage({ params }: GameDetailPageProps) {
               animate={{ opacity: 1, y: 0 }}
               className="mb-8"
             >
-              <h2 className="text-4xl font-black mb-2 gradient-text">Similar Games You Might Like</h2>
+              <h2 className="text-4xl font-bold mb-2 gradient-text">Similar Games You Might Like</h2>
               <p className="text-muted-foreground">More games in the same genre</p>
             </motion.div>
 

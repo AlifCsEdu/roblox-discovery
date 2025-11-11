@@ -73,7 +73,7 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-yellow-400 rounded-full blur-lg opacity-40 group-hover:opacity-80 transition-opacity" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
                   
                   {/* Badge with enhanced gradient */}
-                  <Badge className="relative px-3.5 py-2 text-sm font-black bg-gradient-to-br from-yellow-200 via-yellow-300 to-orange-400 text-yellow-950 border-2 border-yellow-100/70 shadow-2xl backdrop-blur-sm hover:from-yellow-300 hover:via-orange-300 hover:to-amber-400 transition-all duration-300">
+                  <Badge className="relative px-3.5 py-2 text-sm font-semibold bg-gradient-to-br from-yellow-200 via-yellow-300 to-orange-400 text-yellow-950 border-2 border-yellow-100/70 shadow-2xl backdrop-blur-sm hover:from-yellow-300 hover:via-orange-300 hover:to-amber-400 transition-all duration-300">
                     <motion.svg 
                       className="w-4 h-4 mr-1.5 drop-shadow-md" 
                       fill="currentColor" 
@@ -134,7 +134,7 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                     <svg className="w-5 h-5 text-emerald-950 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                     </svg>
-                    <span className="text-emerald-950 text-sm font-black drop-shadow-md tracking-wide">
+                    <span className="text-emerald-950 text-sm font-semibold drop-shadow-md tracking-wide">
                       {formatNumber(game.player_count_current ?? 0)}
                     </span>
                   </div>
@@ -146,7 +146,7 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
           <CardContent className="p-5 relative z-20">
             {/* Enhanced title with better gradient hover */}
             <motion.h3 
-              className="font-black text-lg mb-2.5 line-clamp-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-cyan-400 transition-all duration-300 drop-shadow-sm"
+              className="font-bold text-lg mb-2.5 line-clamp-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-cyan-400 transition-all duration-300 drop-shadow-sm"
               whileHover={{ x: 2 }}
             >
               {game.title}
@@ -185,8 +185,8 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                     </svg>
                   </div>
                   <div className="relative z-10">
-                    <div className="text-sm font-black text-foreground">{formatNumber(game.visits)}</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">visits</div>
+                    <div className="text-sm font-semibold text-foreground">{formatNumber(game.visits)}</div>
+                    <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">visits</div>
                   </div>
                 </motion.div>
               )}
@@ -206,8 +206,8 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                     </svg>
                   </div>
                   <div className="relative z-10">
-                    <div className="text-sm font-black text-foreground">{formatNumber(game.player_count_7d_avg)}</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">avg players</div>
+                    <div className="text-sm font-semibold text-foreground">{formatNumber(game.player_count_7d_avg)}</div>
+                    <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">avg players</div>
                   </div>
                 </motion.div>
               )}
@@ -227,8 +227,8 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                     </svg>
                   </div>
                   <div className="relative z-10">
-                    <div className="text-sm font-black text-foreground">{formatNumber(game.favorite_count)}</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">favorites</div>
+                    <div className="text-sm font-semibold text-foreground">{formatNumber(game.favorite_count)}</div>
+                    <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">favorites</div>
                   </div>
                 </motion.div>
               )}
@@ -248,8 +248,8 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                     </svg>
                   </div>
                   <div className="relative z-10">
-                    <div className="text-sm font-black text-foreground">{formatNumber(game.player_count_peak)}</div>
-                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">peak</div>
+                    <div className="text-sm font-semibold text-foreground">{formatNumber(game.player_count_peak)}</div>
+                    <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">peak</div>
                   </div>
                 </motion.div>
               )}
@@ -268,7 +268,7 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                 >
                   <Badge 
                     variant="secondary" 
-                    className="text-xs font-black px-3 py-1.5 bg-gradient-to-r from-primary/30 via-primary/25 to-primary/35 text-primary border-2 border-primary/50 hover:from-primary/40 hover:via-primary/35 hover:to-primary/45 hover:border-primary/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl hover:shadow-primary/30 backdrop-blur-sm"
+                    className="text-xs font-semibold px-3 py-1.5 bg-gradient-to-r from-primary/30 via-primary/25 to-primary/35 text-primary border-2 border-primary/50 hover:from-primary/40 hover:via-primary/35 hover:to-primary/45 hover:border-primary/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl hover:shadow-primary/30 backdrop-blur-sm"
                   >
                     {genre}
                   </Badge>
@@ -284,7 +284,7 @@ function GameCardComponent({ game, index = 0 }: GameCardProps) {
                 >
                   <Badge 
                     variant="secondary" 
-                    className="text-xs font-black px-3 py-1.5 bg-gradient-to-r from-accent/30 via-accent/25 to-accent/35 text-accent border-2 border-accent/50 hover:from-accent/40 hover:via-accent/35 hover:to-accent/45 hover:border-accent/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl hover:shadow-accent/30 backdrop-blur-sm"
+                    className="text-xs font-semibold px-3 py-1.5 bg-gradient-to-r from-accent/30 via-accent/25 to-accent/35 text-accent border-2 border-accent/50 hover:from-accent/40 hover:via-accent/35 hover:to-accent/45 hover:border-accent/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl hover:shadow-accent/30 backdrop-blur-sm"
                   >
                     +{game.genres.length - 3}
                   </Badge>

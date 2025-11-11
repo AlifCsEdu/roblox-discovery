@@ -126,7 +126,7 @@ function ExplorePageContent() {
         >
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-5xl md:text-7xl font-black mb-4 leading-tight">
+              <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
                 <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
                   Explore Games
                 </span>

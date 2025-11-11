@@ -91,7 +91,7 @@ export default function HomePage() {
             <span className="text-sm font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">7,113+ Games • Live Data</span>
           </motion.div>
 
-          <h1 className="text-6xl md:text-8xl font-black mb-8 leading-tight">
+          <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 dark:from-blue-400 dark:via-purple-400 dark:to-cyan-400 bg-clip-text text-transparent">
               Discover Epic
             </span>
@@ -182,7 +182,7 @@ export default function HomePage() {
             className="flex items-center justify-between mb-10"
           >
             <div>
-              <h2 className="text-4xl font-black mb-3 gradient-text">
+              <h2 className="text-4xl font-bold mb-3 gradient-text">
                 Trending Now
               </h2>
               <p className="text-muted-foreground text-lg">Most popular games with thousands of active players</p>
@@ -240,7 +240,7 @@ export default function HomePage() {
             className="flex items-center justify-between mb-10"
           >
             <div>
-              <h2 className="text-4xl font-black mb-3 gradient-text">
+              <h2 className="text-4xl font-bold mb-3 gradient-text">
                 Hidden Gems
               </h2>
               <p className="text-muted-foreground text-lg">Highly-rated games you might have missed</p>
@@ -301,7 +301,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-5xl font-black mb-4 gradient-text">Why RobloxDiscover?</h2>
+            <h2 className="text-5xl font-bold mb-4 gradient-text">Why RobloxDiscover?</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               The ultimate platform for discovering and exploring Roblox games
             </p>

@@ -148,7 +148,7 @@ export default function GenrePage({ params }: GenrePageProps) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-5xl md:text-7xl font-black mb-6 gradient-text leading-tight"
+              className="text-5xl md:text-7xl font-bold mb-6 gradient-text leading-tight"
             >
               {genre.name} Games
             </motion.h1>
