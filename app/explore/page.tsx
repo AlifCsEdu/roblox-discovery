@@ -6,7 +6,7 @@ import { FilterPanel } from '@/components/features/FilterPanel';
 import { GameGrid } from '@/components/features/GameGrid';
 import { trpc } from '@/lib/api/trpc-client';
 import { Button } from '@/components/ui/button';
-import type { GameFilters } from '@/types';
+import type { GameFilters, Game } from '@/types';
 import { DEFAULT_RATING_MIN, DEFAULT_RATING_MAX, DEFAULT_GAMES_PER_PAGE } from '@/constants/genres';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -25,7 +25,7 @@ function ExplorePageContent() {
   }));
 
   const [page, setPage] = useState(0);
-  const [allGames, setAllGames] = useState<any[]>([]);
+  const [allGames, setAllGames] = useState<Game[]>([]);
 
   // Fetch games with current filters
   const { data, isLoading, error, refetch } = trpc.games.list.useQuery({

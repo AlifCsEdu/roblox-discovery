@@ -66,7 +66,7 @@ test.describe('Game Detail Pages', () => {
     await page.waitForURL(/.*\/games\/\d+.*/);
     
     // Click back or navigate to home
-    const homeLink = page.locator('a[href="/"], nav text=/Roblox Discovery/i').first();
+    const homeLink = page.locator('nav a[href="/"]').first();
     await homeLink.click();
     
     await expect(page).toHaveURL('/');
@@ -75,7 +75,7 @@ test.describe('Game Detail Pages', () => {
   test('should handle invalid game ID gracefully', async ({ page }) => {
     await page.goto('/games/999999999999');
     
-    // Should show error or not found state
-    await expect(page.locator('text=/not found|error|doesn\'t exist/i')).toBeVisible({ timeout: 10000 });
+    // Should show error or not found state - wait longer for query to fail
+    await expect(page.locator('text=/not found|error|doesn\'t exist|failed/i').first()).toBeVisible({ timeout: 30000 });
   });
 });

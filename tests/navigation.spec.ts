@@ -18,7 +18,7 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL(/.*\/search.*/);
     
     // Navigate back to home
-    const homeLink = page.locator('a[href="/"], nav text=/Roblox Discovery/i').first();
+    const homeLink = page.locator('nav a[href="/"]').first();
     await homeLink.click();
     await expect(page).toHaveURL('/');
   });

@@ -56,7 +56,7 @@ export default function Error({
               Something Went Wrong
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              We encountered an unexpected error. Don't worry, it's not your fault!
+              We encountered an unexpected error. Don&apos;t worry, it&apos;s not your fault!
             </p>
           </motion.div>
 

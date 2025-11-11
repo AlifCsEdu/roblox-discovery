@@ -1,7 +1,7 @@
 // Game types
 export interface Game {
   id: string;
-  roblox_id: string;
+  roblox_id: number;
   title: string;
   description: string | null;
   creator: string | null;

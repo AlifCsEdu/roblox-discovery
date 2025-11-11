@@ -18,8 +18,11 @@ test.describe('Explore Page', () => {
   });
 
   test('should display filter panel', async ({ page }) => {
-    // Look for filter controls
-    await expect(page.locator('[data-testid="filter-panel"], aside, .filters').first()).toBeVisible({ timeout: 10000 });
+    // Look for filter panel - it's rendered as an aside with FilterPanel component
+    await expect(page.locator('aside').first()).toBeVisible({ timeout: 10000 });
+    // Check for specific filter sections
+    await expect(page.locator('text=/Sort By/i')).toBeVisible();
+    await expect(page.locator('text=/Genres/i')).toBeVisible();
   });
 
   test('should filter by genre', async ({ page }) => {
@@ -27,14 +30,14 @@ test.describe('Explore Page', () => {
       timeout: 15000 
     });
     
-    // Look for genre filter buttons or dropdown
-    const genreFilter = page.locator('[data-testid="genre-filter"], button:has-text("RPG"), label:has-text("RPG")').first();
+    // Look for a genre badge button (they're rendered as motion.button > Badge)
+    const genreButton = page.locator('button:has-text("RPG")').first();
     
-    if (await genreFilter.isVisible()) {
-      await genreFilter.click();
+    if (await genreButton.isVisible()) {
+      await genreButton.click();
       
       // Wait for filtered results
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
       
       // Verify results still display
       const gameCards = page.locator('[data-testid="game-card"], .game-card, article');
@@ -47,14 +50,14 @@ test.describe('Explore Page', () => {
       timeout: 15000 
     });
     
-    // Look for rating slider
-    const ratingSlider = page.locator('[data-testid="rating-filter"], input[type="range"]').first();
+    // Look for rating slider - it's an input[type="range"] in the FilterPanel
+    const ratingSlider = page.locator('input[type="range"]').first();
     
     if (await ratingSlider.isVisible()) {
       await ratingSlider.fill('75');
       
       // Wait for filtered results
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
       
       // Verify results update
       const gameCards = page.locator('[data-testid="game-card"], .game-card, article');
@@ -67,14 +70,14 @@ test.describe('Explore Page', () => {
       timeout: 15000 
     });
     
-    // Look for player count filter
-    const playerFilter = page.locator('[data-testid="player-filter"], input[type="range"][name*="player"]').first();
+    // Look for sort options instead - there's no player count filter, but there's a "Most Players" sort option
+    const mostPlayersSort = page.locator('button:has-text("Most Players")').first();
     
-    if (await playerFilter.isVisible()) {
-      await playerFilter.fill('1000');
+    if (await mostPlayersSort.isVisible()) {
+      await mostPlayersSort.click();
       
-      // Wait for filtered results
-      await page.waitForTimeout(1000);
+      // Wait for sorted results
+      await page.waitForTimeout(2000);
       
       // Verify results update
       const gameCards = page.locator('[data-testid="game-card"], .game-card, article');
@@ -88,17 +91,17 @@ test.describe('Explore Page', () => {
     });
     
     // Try to apply rating filter
-    const ratingSlider = page.locator('[data-testid="rating-filter"], input[type="range"]').first();
+    const ratingSlider = page.locator('input[type="range"]').first();
     if (await ratingSlider.isVisible()) {
       await ratingSlider.fill('80');
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
     }
     
     // Try to apply genre filter
-    const genreFilter = page.locator('[data-testid="genre-filter"], button:has-text("RPG"), label:has-text("RPG")').first();
-    if (await genreFilter.isVisible()) {
-      await genreFilter.click();
-      await page.waitForTimeout(500);
+    const genreButton = page.locator('button:has-text("RPG")').first();
+    if (await genreButton.isVisible()) {
+      await genreButton.click();
+      await page.waitForTimeout(1000);
     }
     
     // Verify results are still displayed after multiple filters
@@ -124,10 +127,14 @@ test.describe('Explore Page', () => {
     });
     
     // Try to set very restrictive filters that might result in no games
-    const ratingSlider = page.locator('[data-testid="rating-filter"], input[type="range"]').first();
+    const ratingSlider = page.locator('input[type="range"]').first();
     if (await ratingSlider.isVisible()) {
-      await ratingSlider.fill('99');
-      await page.waitForTimeout(1000);
+      await ratingSlider.evaluate((el: HTMLInputElement) => {
+        el.value = '99';
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      await page.waitForTimeout(2000);
       
       // If no results, should show appropriate message or empty state
       // (Don't fail test if results still exist with 99% rating)

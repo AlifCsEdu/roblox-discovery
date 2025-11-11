@@ -65,7 +65,7 @@ export default function GameNotFound() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8">
-              We couldn't find the game you're looking for. It might have been removed, made private, or the ID might be incorrect.
+              We couldn&apos;t find the game you&apos;re looking for. It might have been removed, made private, or the ID might be incorrect.
             </p>
 
             {/* Suggestions */}
